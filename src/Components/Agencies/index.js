@@ -7,24 +7,22 @@ import { useNavigate } from 'react-router-dom'
 
 const columns = [
     { field: 'id', headerName: 'ID', width: 50 },
-    { field: 'carPlateNumber', headerName: 'Plaque', width: 130 },
-    { field: 'brand', headerName: 'Marque', width: 130 },
+    { field: 'phoneNumber', headerName: 'N° de téléphone', width: 120 },
     {
-        field: 'year',
-        headerName: 'Année',
-        type: 'number',
+        field: 'name',
+        headerName: 'Nom complet',
         width: 120,
     },
-    { field: 'model', headerName: 'Modèle', width: 100 },
-    { field: 'createdAt', headerName: 'Date de création', width: 200 },
-    // { field: 'driverLicenseExpiryDate', headerName: 'Expiration de permis', width: 200 },
+    {
+        field: 'email',
+        headerName: 'E-mail',
+        width: 180,
+    }
 ]
 
-export default function Cars(props) {
-    const [cars, setCars] = useState([])
+export default function Agencies(props) {
+    const [agencies, setAgencies] = useState([])
     const [isFetched, setIsFetched] = useState(false)
-
-    const [amount, setAmount] = React.useState(0)
 
     const navigate = useNavigate()
 
@@ -33,7 +31,7 @@ export default function Cars(props) {
 
             await axios({
                 method: "get",
-                url: `${process.env.REACT_APP_API_URL}/owners/cars/list/all`,
+                url: `${process.env.REACT_APP_API_URL}/agencies/`,
                 headers: {
                     "Content-Type": "multipart/form-data",
                     "Authorization": `Bearer ${JSON.parse(localStorage.getItem("data")).token}`
@@ -42,7 +40,7 @@ export default function Cars(props) {
                 .then(function (response) {
                     try {
                         if (response.data?.responseCode === '0') {
-                            setCars(response.data.data)
+                            setAgencies(response.data.data)
                             setIsFetched(true)
                         }
                     } catch {
@@ -60,7 +58,7 @@ export default function Cars(props) {
 
     const handleRowClick = (params) => {
         const { id } = params.row
-        navigate('/admins/cars-' + id)
+        navigate('/admins/agency-' + id)
     }
 
     return (
@@ -68,12 +66,12 @@ export default function Cars(props) {
             <br /><br />
             <Grid container>
                 <Grid xs={6} item>
-                    <h2>Liste des voitures</h2>
+                    <h2>Liste des agences</h2>
                 </Grid>
                 <Grid xs={6} item textAlign={"right"}>
                     <Button variant="contained" disableElevation startIcon={<Add />} sx={{ borderRadius: 5 }} onClick={() => {
-                        navigate('/admins/create-car')
-                    }} disabled={!props.userRights?.split(',').includes('2') && JSON.parse(localStorage.getItem('data')).id != 1}>
+                        navigate('/admins/create-agency')
+                    }}>
                         <strong>Créer</strong>
                     </Button>
                 </Grid>
@@ -85,11 +83,11 @@ export default function Cars(props) {
                     </div> :
                     <Fragment>
                         {
-                            cars.length === 0 ?
-                                <Typography textAlign={'center'} color={'GrayText'}><strong>Pas de voiture créée</strong>.</Typography> :
+                            agencies.length === 0 ?
+                                <Typography textAlign={'center'} color={'GrayText'}><strong>Pas de propriétaire créé</strong>.</Typography> :
                                 <DataGrid
                                     sx={{ borderRadius: 5 }}
-                                    rows={cars}
+                                    rows={agencies}
                                     columns={columns}
                                     onRowDoubleClick={handleRowClick}
                                     initialState={{

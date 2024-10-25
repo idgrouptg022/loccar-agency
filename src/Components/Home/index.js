@@ -4,52 +4,16 @@ import React, { Fragment, useEffect, useState } from 'react'
 import SidebBar from '../SideBar'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { io } from "socket.io-client"
-import Profile from '../../Components/Profile'
-import Cars from '../Cars/'
-import Car from '../Cars/Car'
-import CreateCar from '../Cars/Create'
-import Accidents from '../Accidents'
-import Accident from '../Accidents/Accident'
 import CardTypes from '../CardTypes'
-import Owners from '../Owners'
-import CreateOwner from '../Owners/Create'
-import Owner from '../Owners/Owner'
-import AcceptedInvoice from '../Invoices/Accepted'
-import ClassifiedInvoice from '../Invoices/Classified'
-import RejectedInvoice from '../Invoices/Rejected'
-import CommentedInvoice from '../Invoices/Commented'
-import BreakDowns from '../BreakDowns'
-import BreakDown from '../BreakDowns/BreakDown'
-import Settings from '../Settings'
-import Funds from '../Funds'
-import Maintenances from '../Maintenances'
-import Maintenance from '../Maintenances/Maintenance'
-import GeolocationNotifications from '../GeolocationNotifications'
-import Assurances from '../Assurances'
-import TechnicalVisits from '../TechnicalVisits'
-import Tvms from '../Tvms'
-import OutdateDriverLicence from '../Outdates/DriverLicence'
-import OutdateAssurance from '../Outdates/Assurance'
-import OutdateTechnicalVisit from '../Outdates/TechnicalVisit'
-import OutdateTvm from '../Outdates/Tvm'
-import EditOwner from '../Owners/Edit'
-import EditCar from '../Cars/Edit'
-import PayedInvoice from '../Invoices/Payed'
-import EditDriver from '../Driver/Edit'
-import Users from '../Users'
-import CreateUser from '../Users/Create'
-import EditUser from '../Users/Edit'
-import User from '../Users/User'
-import Renewals from '../Renewals'
-import Tenants from '../Tenants'
-import Tenant from '../Tenants/Tenant'
-import Rentals from '../Rentals'
-import Rental from '../Rentals/Rental'
+import Agencies from '../Agencies'
+// import CreateOwner from '../Agencies/Create'
+import Agency from '../Agencies/Agency'
+
 import Categories from '../Categories'
 import Category from '../Categories/Category'
 import CreateCategory from '../Categories/Create'
-import CreateTenant from '../Tenants/CreateTenant'
-import Advertising from '../Advertising'
+import EditAgency from '../Agencies/Edit'
+import CreateAgency from '../Agencies/Create'
 
 const socket = io.connect(process.env.REACT_APP_API_BASE_URL, {
     query: {
@@ -92,177 +56,25 @@ export default function Home() {
     const navigate = useNavigate()
 
     const Component = () => {
-        if (params.page === undefined) {
+        if (params.page === undefined || params.page === 'agencies') {
             return (
-                <Owners userRights={administrators[0].rightsId} />
+                <Agencies userRights={administrators[0].rightsId} />
             )
-        } else if (params.page === ("cars")) {
+        } else if (params.page.startsWith('agency-')) {
             return (
-                <Cars userRights={administrators[0].rightsId} />
+                <Agency agency={params.page.substring(7)} />
             )
-        } else if (params.page.startsWith("drivers-")) {
+        } else if (params.page === 'create-agency') {
             return (
-                <EditDriver userRights={administrators[0].rightsId} driver={params.page.substring(8)} />
+                <CreateAgency />
             )
-        } else if (params.page === ("profile")) {
+        } else if (params.page.startsWith('edit-agency-')) {
             return (
-                <Profile userRights={administrators[0].rightsId} admin={administrators[0]} />
-            )
-        } else if (params.page === ("create-car")) {
-            return (
-                <CreateCar userRights={administrators[0].rightsId} />
-            )
-        } else if(params.page === 'accidents') {
-            return (
-                <Accidents userRights={administrators[0].rightsId} socket={socket} />
-            )
-        } else if(params.page.startsWith('accidents')) {
-            return (
-                <Accident userRights={administrators[0].rightsId} socket={socket} accident={params.page.substring(10)} />
+                <EditAgency agency={params.page.substring(12)} />
             )
         } else if(params.page === ('card-types')) {
             return (
                 <CardTypes userRights={administrators[0].rightsId} />
-            )
-        } else if(params.page === ('owners')) {
-            return (
-                <Owners userRights={administrators[0].rightsId} />
-            )
-        } else if(params.page === ('create-owner')) {
-            return (
-                <CreateOwner userRights={administrators[0].rightsId} />
-            )
-        } else if(params.page.startsWith('owners-')) {
-            return (
-                <Owner userRights={administrators[0].rightsId} owner={params.page.substring(7)} />
-            )
-        } else if(params.page.startsWith('owner-')) {
-            return (
-                <EditOwner userRights={administrators[0].rightsId} owner={params.page.substring(6)} />
-            )
-        } else if(params.page === ('payed-invoices')) {
-            return (
-                <PayedInvoice userRights={administrators[0].rightsId} />
-            )
-        } else if(params.page === ('accepted-invoices')) {
-            return (
-                <AcceptedInvoice userRights={administrators[0].rightsId} socket={socket} />
-            )
-        } else if(params.page === ('classified-invoices')) {
-            return (
-                <ClassifiedInvoice userRights={administrators[0].rightsId} socket={socket} />
-            )
-        } else if(params.page === ('rejected-invoices')) {
-            return (
-                <RejectedInvoice userRights={administrators[0].rightsId} socket={socket} />
-            )
-        } else if(params.page === ('commented-invoices')) {
-            return (
-                <CommentedInvoice userRights={administrators[0].rightsId} socket={socket} />
-            )
-        } else if(params.page === ('breakdowns')) {
-            return (
-                <BreakDowns userRights={administrators[0].rightsId} socket={socket} />
-            )
-        } else if(params.page.startsWith('breakdowns-')) {
-            return (
-                <BreakDown userRights={administrators[0].rightsId} breakDown={params.page.substring(11)} />
-            )
-        } else if (params.page.startsWith('cars-')) {
-            return (
-                <Car userRights={administrators[0].rightsId} car={params.page.substring(5)} />
-            )
-        } else if (params.page.startsWith('car-')) {
-            return (
-                <EditCar userRights={administrators[0].rightsId} car={params.page.substring(4)} />
-            )
-        } else if (params.page === 'settings') {
-            return (
-                <Settings userRights={administrators[0].rightsId} />
-            )
-        } else if (params.page === 'funds') {
-            return (
-                <Funds userRights={administrators[0].rightsId} />
-            )
-        } else if (params.page === 'maintenances') {
-            return (
-                <Maintenances userRights={administrators[0].rightsId} />
-            )
-        } else if (params.page.startsWith('maintenances-')) {
-            return (
-                <Maintenance userRights={administrators[0].rightsId} maintenance={params.page.substring(13)} />
-            )
-        } else if (params.page === 'geolocation-notifications') {
-            return (
-                <GeolocationNotifications userRights={administrators[0].rightsId} socket={socket} />
-            )
-        } else if (params.page.startsWith('assurances-')) {
-            return (
-                <Assurances userRights={administrators[0].rightsId} car={params.page.substring(11)} />
-            )
-        } else if (params.page.startsWith('technical-visits-')) {
-            return (
-                <TechnicalVisits userRights={administrators[0].rightsId} car={params.page.substring(17)} />
-            )
-        } else if (params.page.startsWith('tvms-')) {
-            return (
-                <Tvms car={params.page.substring(5)} userRights={administrators[0].rightsId} />
-            )
-        } else if (params.page === 'outdates-driver-licenses') {
-            return (
-                <OutdateDriverLicence userRights={administrators[0].rightsId} />
-            )
-        } else if (params.page === 'outdates-assurances') {
-            return (
-                <OutdateAssurance userRights={administrators[0].rightsId} />
-            )
-        } else if (params.page === 'outdates-technical-visits') {
-            return (
-                <OutdateTechnicalVisit userRights={administrators[0].rightsId} />
-            )
-        } else if (params.page === 'outdates-tvms') {
-            return (
-                <OutdateTvm userRights={administrators[0].rightsId} />
-            )
-        } else if (params.page === 'users') {
-            return (
-                <Users userRights={administrators[0].rightsId} />
-            )
-        } else if (params.page === 'create-user') {
-            return (
-                <CreateUser userRights={administrators[0].rightsId} />
-            )
-        } else if (params.page.startsWith('user-')) {
-            return (
-                <EditUser userRights={administrators[0].rightsId} user={params.page.substring(5)} />
-            )
-        } else if (params.page.startsWith('users-')) {
-            return (
-                <User user={params.page.substring(6)} userRights={administrators[0].rightsId} />
-            )
-        } else if (params.page === 'renewals') {
-            return (
-                <Renewals socket={socket} userRights={administrators[0].rightsId} />
-            )
-        } else if (params.page === 'tenants') {
-            return (
-                <Tenants socket={socket} />
-            )
-        } else if (params.page.startsWith('tenants-')) {
-            return (
-                <Tenant tenant={params.page.substring(8)} />
-            )
-        } else if (params.page === 'create-tenant') {
-            return (
-                <CreateTenant />
-            )
-        } else if (params.page === 'rentals') {
-            return (
-                <Rentals socket={socket} />
-            )
-        } else if (params.page.startsWith('rentals-')) {
-            return (
-                <Rental rental={params.page.substring(8)} />
             )
         } else if (params.page === 'categories') {
             return (
@@ -275,10 +87,6 @@ export default function Home() {
         } else if (params.page === 'create-category') {
             return (
                 <CreateCategory />
-            )
-        } else if (params.page === 'advertising') {
-            return (
-                <Advertising socket={socket} />
             )
         }
     }

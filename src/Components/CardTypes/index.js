@@ -34,8 +34,7 @@ export default function CardTypes(props) {
     const [openAlert, setOpenAlert] = React.useState(false)
 
     const handleCreateCardType = async (e) => {
-        if (props.userRights?.split(',').includes('25') || JSON.parse(localStorage.getItem('data')).id == 1) {
-            let canSubmit = true
+        let canSubmit = true
             e.preventDefault()
 
             setNameError(false)
@@ -90,37 +89,34 @@ export default function CardTypes(props) {
                         setIsLoading(false)
                     })
             }
-        }
     }
 
     const handleDeleteCardType = async () => {
-        if (props.userRights?.split(',').includes('25') || JSON.parse(localStorage.getItem('data')).id == 1) {
-            await axios({
-                method: "delete",
-                url: `${process.env.REACT_APP_API_URL}/card-types/${currentCardTypeId}`,
-                headers: {
-                    "Content-Type": "multipart/form-data",
-                    "Authorization": `Bearer ${JSON.parse(localStorage.getItem("data")).token}`
+        await axios({
+            method: "delete",
+            url: `${process.env.REACT_APP_API_URL}/card-types/${currentCardTypeId}`,
+            headers: {
+                "Content-Type": "multipart/form-data",
+                "Authorization": `Bearer ${JSON.parse(localStorage.getItem("data")).token}`
+            }
+        })
+            .then(function (response) {
+                try {
+                    if (response.data?.responseCode === '0') {
+                        setOpenAlert(false)
+                        setIsSuccessed(true)
+                        setIsSuccessedMessage("Le type de carte a été supprimé avec succès !")
+                        setCurrentCardTypeId(0)
+                        setName("")
+                        fetchData()
+                    }
+                } catch {
+                    //
                 }
             })
-                .then(function (response) {
-                    try {
-                        if (response.data?.responseCode === '0') {
-                            setOpenAlert(false)
-                            setIsSuccessed(true)
-                            setIsSuccessedMessage("Le type de carte a été supprimé avec succès !")
-                            setCurrentCardTypeId(0)
-                            setName("")
-                            fetchData()
-                        }
-                    } catch {
-                        //
-                    }
-                })
-                .catch(function (error) {
-                    //
-                })
-        }
+            .catch(function (error) {
+                //
+            })
     }
 
     async function fetchData() {
@@ -162,7 +158,7 @@ export default function CardTypes(props) {
                     <h2>Liste des types de cartes</h2>
                 </Grid>
                 <Grid xs={6} item textAlign={"right"}>
-                    <Button variant="contained" disabled={!props.userRights?.split(',').includes('25') && JSON.parse(localStorage.getItem('data')).id != 1} disableElevation startIcon={<Add />} sx={{ borderRadius: 5 }} onClick={() => {
+                    <Button variant="contained"  disableElevation startIcon={<Add />} sx={{ borderRadius: 5 }} onClick={() => {
                         setOpenModal(true)
                     }}>
                         <strong>Créer</strong>
@@ -235,84 +231,79 @@ export default function CardTypes(props) {
                 </Grid>
             </Grid><br />
             {
-                !props.userRights?.split(',').includes('25') && JSON.parse(localStorage.getItem('data')).id != 1 ?
-                    <Typography textAlign={`center`} typography={`h5`}>
-                        <br /><br /><br />
-                        Non autorisé !
-                    </Typography> :
-                    !isFetched ?
-                        <div style={{ textAlign: 'center', height: '65vh', lineHeight: '65vh' }}>
-                            <CircularProgress />
-                        </div> :
-                        <Fragment>
-                            {
-                                cards.length === 0 ?
-                                    <Typography textAlign={'center'} color={'GrayText'}><strong>Pas de type de carte créé</strong>.</Typography> :
-                                    <Grid container spacing={2}>
-                                        {
-                                            cards.map((data) => {
-                                                return (
-                                                    <Grid xl={4} lg={4} item key={data.id}>
-                                                        <Card variant='outlined' sx={{ pt: 3, pl: 3, pr: 3, pb: 1, borderRadius: 5 }}>
-                                                            <h3>{data.name}</h3><br />
+                   !isFetched ?
+                   <div style={{ textAlign: 'center', height: '65vh', lineHeight: '65vh' }}>
+                       <CircularProgress />
+                   </div> :
+                   <Fragment>
+                       {
+                           cards.length === 0 ?
+                               <Typography textAlign={'center'} color={'GrayText'}><strong>Pas de type de carte créé</strong>.</Typography> :
+                               <Grid container spacing={2}>
+                                   {
+                                       cards.map((data) => {
+                                           return (
+                                               <Grid xl={4} lg={4} item key={data.id}>
+                                                   <Card variant='outlined' sx={{ pt: 3, pl: 3, pr: 3, pb: 1, borderRadius: 5 }}>
+                                                       <h3>{data.name}</h3><br />
 
-                                                            <div style={{ height: 40, overflow: 'auto' }}>{data.description ? data.description : <span style={{ color: 'GrayText' }}>Sans description.</span>}</div><br />
+                                                       <div style={{ height: 40, overflow: 'auto' }}>{data.description ? data.description : <span style={{ color: 'GrayText' }}>Sans description.</span>}</div><br />
 
-                                                            <IconButton color='primary' onClick={() => {
-                                                                setCurrentCardTypeId(data.id)
-                                                                setOpenModal(true)
+                                                       <IconButton color='primary' onClick={() => {
+                                                           setCurrentCardTypeId(data.id)
+                                                           setOpenModal(true)
 
-                                                                setName(data.name)
-                                                                setDescription(data.description)
-                                                            }}>
-                                                                <Edit />
-                                                            </IconButton>
+                                                           setName(data.name)
+                                                           setDescription(data.description)
+                                                       }}>
+                                                           <Edit />
+                                                       </IconButton>
 
-                                                            <IconButton color='error' onClick={() => {
-                                                                setCurrentCardTypeId(data.id)
-                                                                setName(data.name)
-                                                                setOpenAlert(true)
-                                                            }}>
-                                                                <Delete />
-                                                            </IconButton>
+                                                       <IconButton color='error' onClick={() => {
+                                                           setCurrentCardTypeId(data.id)
+                                                           setName(data.name)
+                                                           setOpenAlert(true)
+                                                       }}>
+                                                           <Delete />
+                                                       </IconButton>
 
-                                                            <Dialog
-                                                                open={openAlert}
-                                                                onClose={() => {
-                                                                    setOpenAlert(false)
-                                                                    setCurrentCardTypeId(0)
-                                                                    setName("")
-                                                                }}
-                                                                aria-labelledby="alert-dialog-title"
-                                                                aria-describedby="alert-dialog-description"
-                                                            >
-                                                                <DialogTitle id="alert-dialog-title">
-                                                                    {"Supprimer ce type de carte ?"}
-                                                                </DialogTitle>
-                                                                <DialogContent>
-                                                                    <DialogContentText id="alert-dialog-description">
-                                                                        Êtes-vous sûr(e) de vouloir supprimer le type de carte "<strong>{name}</strong>" ? Cette action sera défintive et irréversible !
-                                                                    </DialogContentText>
-                                                                </DialogContent>
-                                                                <DialogActions>
-                                                                    <Button onClick={() => {
-                                                                        setOpenAlert(false)
-                                                                        setCurrentCardTypeId(0)
-                                                                        setName("")
-                                                                    }}>Fermer</Button>
-                                                                    <Button color='error' onClick={handleDeleteCardType} autoFocus>
-                                                                        Supprimer
-                                                                    </Button>
-                                                                </DialogActions>
-                                                            </Dialog>
-                                                        </Card>
-                                                    </Grid>
-                                                )
-                                            })
-                                        }
-                                    </Grid>
-                            }
-                        </Fragment>
+                                                       <Dialog
+                                                           open={openAlert}
+                                                           onClose={() => {
+                                                               setOpenAlert(false)
+                                                               setCurrentCardTypeId(0)
+                                                               setName("")
+                                                           }}
+                                                           aria-labelledby="alert-dialog-title"
+                                                           aria-describedby="alert-dialog-description"
+                                                       >
+                                                           <DialogTitle id="alert-dialog-title">
+                                                               {"Supprimer ce type de carte ?"}
+                                                           </DialogTitle>
+                                                           <DialogContent>
+                                                               <DialogContentText id="alert-dialog-description">
+                                                                   Êtes-vous sûr(e) de vouloir supprimer le type de carte "<strong>{name}</strong>" ? Cette action sera défintive et irréversible !
+                                                               </DialogContentText>
+                                                           </DialogContent>
+                                                           <DialogActions>
+                                                               <Button onClick={() => {
+                                                                   setOpenAlert(false)
+                                                                   setCurrentCardTypeId(0)
+                                                                   setName("")
+                                                               }}>Fermer</Button>
+                                                               <Button color='error' onClick={handleDeleteCardType} autoFocus>
+                                                                   Supprimer
+                                                               </Button>
+                                                           </DialogActions>
+                                                       </Dialog>
+                                                   </Card>
+                                               </Grid>
+                                           )
+                                       })
+                                   }
+                               </Grid>
+                       }
+                   </Fragment> 
             }
         </div>
     )
